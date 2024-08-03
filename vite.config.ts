@@ -6,24 +6,30 @@ import unimport from 'unimport/unplugin';
 
 export default defineConfig({
   root: 'playground',
+
   plugins: [
     vue(),
     unimport.vite({
       presets: [
         'vue',
       ],
+      imports: [
+        { name: 'defu', from: 'defu' }
+      ]
     }),
   ],
+
   resolve: {
     alias: {
-      zlider: resolve(__dirname, 'src/main.ts'),
+      zlider: resolve(__dirname, 'src'),
     }
   },
+
   build: {
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
     lib: {
-      entry: resolve(__dirname, 'src/main.ts'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'Zlider',
       fileName: 'zlider'
     },

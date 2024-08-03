@@ -1,0 +1,29 @@
+.zlider {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    width: 100%;
+}
+
+.zlider .zlider__positioner {
+    position: relative;
+    height: 100%;
+}
+
+.zlider .zlider__slide {
+    flex-shrink: 0;
+}
+
+.zlider .zlider__prev, .zlider .zlider__next {
+    transform: translateY(-50%);
+    position: absolute;
+    top: 50%;
+}
+
+.zlider .zlider__prev {
+    left: 0;
+}
+
+.zlider .zlider__next {
+    right: 0;
+}

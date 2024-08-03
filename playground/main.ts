@@ -1,6 +1,7 @@
-import App from './App.vue';
-
 import zlider from 'zlider';
+import 'zlider/style.css';
+
+import App from './App.vue';
 
 const app = createApp(App);
 
