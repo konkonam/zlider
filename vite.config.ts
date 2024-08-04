@@ -30,7 +30,7 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'Zlider',
+      name: 'zlider',
       fileName: 'zlider'
     },
     rollupOptions: {

@@ -1,12 +1,8 @@
 <script setup lang="ts">
-const zlider = ref(null);
+import type { Zlider } from 'zlider/types';
 
-onMounted(() => {
-    // zlider.value?.go(2);
-    // zlider.value?.jump(-2);
-    // zlider.value?.prev();
-    // zlider.value?.next();
-})
+const zlider = ref<Zlider>(null);
+const zlider2 = ref<Zlider>(null);
 </script>
 
 <template>
@@ -15,13 +11,49 @@ onMounted(() => {
 
         <h2>Basic</h2>
 
-        <Zlider ref="zlider">
-            <div class="my-custom-slide">Slide 1</div>
-            <div class="my-custom-slide">Slide 2</div>
-            <div class="my-custom-slide">Slide 3</div>
-            <div class="my-custom-slide">Slide 4</div>
-            <div class="my-custom-slide">Slide 5</div>
-        </Zlider>
+        <ul
+            v-zlider
+            @zlider:mounted="(z) => zlider = z"
+        >
+            <li class="my-custom-slide">Slide 1</li>
+            <li class="my-custom-slide">Slide 2</li>
+            <li class="my-custom-slide">Slide 3</li>
+            <li class="my-custom-slide">Slide 4</li>
+            <li class="my-custom-slide">Slide 5</li>
+        </ul>
+
+        <nav>
+            <button @click="zlider?.controller?.prev">
+                prev
+            </button>
+            <button @click="zlider?.controller?.next">
+                next
+            </button>
+        </nav>
+
+        <h2>Basic (v-for)</h2>
+
+        <ul
+            v-zlider="{ arrows: false }"
+            @zlider:mounted="(z) => zlider2 = z"
+        >
+            <li
+                v-for="index in [1, 2, 3, 4, 5]"
+                class="my-custom-slide"
+                :key="`my-custom-slide-${index}`"
+            >
+                Slide {{ index }}
+            </li>
+        </ul>
+
+        <nav>
+            <button @click="zlider2?.controller?.prev">
+                prev
+            </button>
+            <button @click="zlider2?.controller?.next">
+                next
+            </button>
+        </nav>
     </div>
 </template>
 
@@ -36,6 +68,11 @@ html, body {
 </style>
 
 <style scoped>
+ul {
+    list-style: none;
+    padding: 0;
+}
+
 .my-custom-slide {
     height: 300px;
     width: 100%;
