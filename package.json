@@ -2,7 +2,9 @@
     "name": "zlider",
     "version": "0.0.1",
     "type": "module",
-    "files": [ "dist" ],
+    "files": [
+        "dist"
+    ],
     "main": "./dist/zlider.umd.cjs",
     "module": "./dist/zlider.js",
     "exports": {
@@ -16,10 +18,11 @@
         "dev": "vite dev"
     },
     "dependencies": {
-        "vue": "^3.4.35",
-        "defu": "^6.1.4"
+        "defu": "^6.1.4",
+        "vue": "^3.4.35"
     },
     "devDependencies": {
+        "@types/node": "^22.1.0",
         "@vitejs/plugin-vue": "^5.1.2",
         "unimport": "^3.9.1",
         "vite": "^5.3.5"
