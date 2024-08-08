@@ -2,10 +2,10 @@
 import type { Zlider } from 'zlider/types';
 
 const zlider = ref<Zlider>();
-const zlider2 = ref<Zlider>();
 
-
-const zlider3 = ref<Zlider>();
+onMounted(() => {
+    const controller = zlider.value;
+});
 </script>
 
 <template>
@@ -14,10 +14,9 @@ const zlider3 = ref<Zlider>();
 
         <h2>Basic</h2>
 
-        <ul ref="zlider3"
-            v-zlider="{
-                arrows: false
-            }"
+        <ul
+            ref="zlider"
+            v-zlider
         >
             <li class="my-custom-slide">Slide 1</li>
             <li class="my-custom-slide">Slide 2</li>
@@ -25,26 +24,19 @@ const zlider3 = ref<Zlider>();
             <li class="my-custom-slide">Slide 4</li>
             <li class="my-custom-slide">Slide 5</li>
 
-            <template #controls>
-                <nav>
-                    <button @click="zlider3?.prev">
-                        prev
-                    </button>
-                    <button @click="zlider3?.next">
-                        next
-                    </button>
-                </nav>
-            </template>
-        </ul>
+            <nav v-zlider:arrows>
+                <button v-zlider:arrows.prev>
+                    prev
+                </button>
+                <button v-zlider:arrows.next>
+                    next
+                </button>
+            </nav>
 
-        <nav>
-            <button @click="zlider3?.controller?.prev">
-                prev
-            </button>
-            <button @click="zlider3?.controller?.next">
-                next
-            </button>
-        </nav>
+            <nav v-zlider:pagination>
+                <span>I am pagination</span>
+            </nav>
+        </ul>
 
         <h2>Basic (v-for)</h2>
 
@@ -60,15 +52,6 @@ const zlider3 = ref<Zlider>();
                 Slide {{ index }}
             </li>
         </ul>
-
-        <nav>
-            <button @click="zlider2?.controller?.prev">
-                prev
-            </button>
-            <button @click="zlider2?.controller?.next">
-                next
-            </button>
-        </nav>
     </div>
 </template>
 

@@ -12,3 +12,9 @@
 .zlider .zlider__slide__hidden {
     display: none;
 }
+
+.zlider .zlider__arrows {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

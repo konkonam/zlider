@@ -1,63 +1,103 @@
+import type { App, DirectiveBinding, VNode } from "vue";
 import type { Options } from "./types";
-import { type App } from "vue";
+
 import { defu } from "defu";
+import { DirectiveHook } from "@vue/runtime-core";
+import { computed, h, render } from "vue";
 
-/*
-1. events using native event listeners
-2. create a controller on mounted and on updated
-
-
-*/
+type MountedFn = DirectiveHook<HTMLElement, DirectiveBinding<V>, VNode<any, HTMLElement>>;
 
 const defaultOptions: Options = {
     arrows: true,
 } as const;
 
+const getParentElement = (element: HTMLElement & { zlider?: Zlider }, depth: 0) => {
+    if (depth > 10) return;
 
-const destroyZlider = (element: HTMLElement) => {
-    element.removeEventListener('zlider:jump');
-    element.removeEventListener('zlider:go');
-    element.removeEventListener('zlider:prev');
-    element.removeEventListener('zlider:next');
-}
+    if (element.zlider !== undefined) {
+        return element;
+    }
 
-const initZlider = (element: HTMLElement, options: Options) => {
-    destroyZlider(element)
+    return getParentElement(element.parentElement, depth++);
+};
 
-    element.addEventListener('zlider:jump', (by: number) => jump(by));
-    element.addEventListener('zlider:go', (to: number) => go(to));
-    element.addEventListener('zlider:prev', () => jump(-1));
-    element.addEventListener('zlider:next', () => jump(1));
-}
+const init: MountedFn = (element, binding, vnode) => {
+    const children = computed(() => element.children);
+    const options = vnode.zlider.options;
+
+    const index = ref(0);
+
+    const jump = (by: number) => {
+        index.value = (index.value + by + children.value.length) % children.value.length;
+    }
+
+    const go = (to: number) => {
+        index.value = to % children.value.length;
+    }
+
+    element.zlider.controller = { jump, go };
+
+    element.classList.add('zlider');
+    for (const slide of children.value) {
+        slide.classList.add('zlider__slide');
+    }
+
+    if (!element.__zlider_arrows) {
+        const arrows = h('nav', { class: 'zlider__arrows' }, [
+            h('button', 'Prev'),
+            h('button', 'Next'),
+        ]);
+
+        render(arrows, element);
+    }
+
+    if (!element.__zlider_pagination) {
+        const pagination = h('div', 'Test');
+
+        render(pagination, element);
+    }
+};
+
+const initArrows: MountedFn = (element, binding, vnode) => {
+    console.log(getParentElement(element).zlider);
+};
+
+const initPagination: MountedFn = (element, binding, vnode) => {
+    console.log(getParentElement(element).zlider);
+};
+
+const mounted: MountedFn = (element, binding, vnode) => {
+    switch (binding.arg) {
+        case undefined:
+            init(element, binding, vnode);
+            break;
+        case 'arrows':
+            initArrows(element, binding, vnode);
+            break;
+        case 'pagination':
+            initPagination(element, binding, vnode);
+            break;
+        default:
+            console.error('Invalid usage of v-zlider directive');
+            break;
+    }
+};
+
+const created: MountedFn = (element, binding, vnode) => {
+    if (binding.arg !== undefined) return;
+
+    const options = defu(binding.value, defaultOptions);
+
+    element.zlider = {
+        controller: {},
+        options,
+    };
+};
 
 const install = (app: App) => {
     app.directive<HTMLElement, Options>('zlider', {
-        mounted: (element, binding, vnode) => {
-            const index = ref(0)
-
-            console.log(element)
-            console.log(binding)
-            console.log(vnode)
-
-            const options = computed(() => defu(binding.value, defaultOptions));
-            const children = computed(() => element.children);
-
-            const jump = (by: number) => {
-                index.value = (index.value + by + children.value.length) % children.value.length;
-            }
-
-            const go = (to: number) => {
-                index.value = to % children.value.length;
-            }
-
-            element.classList.add('zlider');
-            for (const slide of children.value) {
-                slide.classList.add('zlider__slide');
-            }
-        },
-        updated: (element, binding, vnode) => {
-
-        }
+        created,
+        mounted,
     });
 };
 
