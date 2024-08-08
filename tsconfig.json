@@ -1,33 +1,16 @@
 {
     "compilerOptions": {
-        "module": "esnext",
-        "moduleDetection": "force",
-        "moduleResolution": "bundler",
-        "esModuleInterop": true,
-        "isolatedModules": true,
-        "strict": true,
-        "strictNullChecks": true,
-
-        "noImplicitAny": true,
-        "noUncheckedIndexedAccess": true,
-        "noUnusedLocals": true,
-
-        "declaration": true,
-        "declarationMap": true,
-
-        "noEmit": true,
-        "incremental": true,
-
-        "target": "esnext",
-        "lib": ["esnext", "dom"],
-        "jsx": "preserve",
-        "types": ["node"]
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
     },
     "include": [
-        "src/*.{ts,vue}",
+        "**/*.ts",
         "**/*.vue"
     ],
-
+    "files": [
+        "./src"
+    ],
     "exclude": [
         "node_modules"
     ]

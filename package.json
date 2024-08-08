@@ -18,13 +18,13 @@
         "dev": "vite dev"
     },
     "dependencies": {
-        "defu": "^6.1.4",
-        "vue": "^3.4.35"
+        "defu": "^6.1",
+        "vue": "^3.4"
     },
     "devDependencies": {
-        "@types/node": "^22.1.0",
-        "@vitejs/plugin-vue": "^5.1.2",
-        "unimport": "^3.9.1",
-        "vite": "^5.3.5"
+        "@types/node": "^22.1",
+        "@vitejs/plugin-vue": "^5.1",
+        "unimport": "^3.9",
+        "vite": "^5.3"
     }
 }

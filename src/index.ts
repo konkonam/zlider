@@ -1,42 +1,63 @@
-import type { App } from "vue";
-import type { Options, State, Controller, Zlider } from "./types";
+import type { Options } from "./types";
+import { type App } from "vue";
+import { defu } from "defu";
+
+/*
+1. events using native event listeners
+2. create a controller on mounted and on updated
+
+
+*/
+
+const defaultOptions: Options = {
+    arrows: true,
+} as const;
+
+
+const destroyZlider = (element: HTMLElement) => {
+    element.removeEventListener('zlider:jump');
+    element.removeEventListener('zlider:go');
+    element.removeEventListener('zlider:prev');
+    element.removeEventListener('zlider:next');
+}
+
+const initZlider = (element: HTMLElement, options: Options) => {
+    destroyZlider(element)
+
+    element.addEventListener('zlider:jump', (by: number) => jump(by));
+    element.addEventListener('zlider:go', (to: number) => go(to));
+    element.addEventListener('zlider:prev', () => jump(-1));
+    element.addEventListener('zlider:next', () => jump(1));
+}
 
 const install = (app: App) => {
     app.directive<HTMLElement, Options>('zlider', {
-        created: (element, binding, vnode) => {
-            const options = computed<Options>(() => defu(binding.value, {
-                arrows: true,
-            }));
+        mounted: (element, binding, vnode) => {
+            const index = ref(0)
 
-            const state = reactive<State>({
-                index: 0,
-                length: element.children.length,
-            });
+            console.log(element)
+            console.log(binding)
+            console.log(vnode)
 
-            const jump = (offset) => state.index = (state.index + offset + state.length) % state.length;
-            const go = (index) => state.index = index % state.length;
-            const prev = () => jump(-1);
-            const next = () => jump(1);
+            const options = computed(() => defu(binding.value, defaultOptions));
+            const children = computed(() => element.children);
 
-            const controller: Controller = { jump, go, prev, next };
-            const zlider: Zlider = { state, controller, options };
-
-            element.classList.add('zlider');
-            for (const slide of element.children) {
-                slide.classList.add('zlider__slide');
+            const jump = (by: number) => {
+                index.value = (index.value + by + children.value.length) % children.value.length;
             }
 
-            watch(state, (value) => {
-                let index = 0;
-                for (const slide of element.children) {
-                    slide.classList.toggle('zlider__slide__hidden', index !== value.index);
+            const go = (to: number) => {
+                index.value = to % children.value.length;
+            }
 
-                    index++;
-                }
-            }, { immediate: true });
-
-            vnode.props?.['onZlider:mounted']?.(zlider);
+            element.classList.add('zlider');
+            for (const slide of children.value) {
+                slide.classList.add('zlider__slide');
+            }
         },
+        updated: (element, binding, vnode) => {
+
+        }
     });
 };
 

@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { Zlider } from 'zlider/types';
 
-const zlider = ref<Zlider>(null);
-const zlider2 = ref<Zlider>(null);
+const zlider = ref<Zlider>();
+const zlider2 = ref<Zlider>();
+
+
+const zlider3 = ref<Zlider>();
 </script>
 
 <template>
@@ -11,22 +14,34 @@ const zlider2 = ref<Zlider>(null);
 
         <h2>Basic</h2>
 
-        <ul
-            v-zlider
-            @zlider:mounted="(z) => zlider = z"
+        <ul ref="zlider3"
+            v-zlider="{
+                arrows: false
+            }"
         >
             <li class="my-custom-slide">Slide 1</li>
             <li class="my-custom-slide">Slide 2</li>
             <li class="my-custom-slide">Slide 3</li>
             <li class="my-custom-slide">Slide 4</li>
             <li class="my-custom-slide">Slide 5</li>
+
+            <template #controls>
+                <nav>
+                    <button @click="zlider3?.prev">
+                        prev
+                    </button>
+                    <button @click="zlider3?.next">
+                        next
+                    </button>
+                </nav>
+            </template>
         </ul>
 
         <nav>
-            <button @click="zlider?.controller?.prev">
+            <button @click="zlider3?.controller?.prev">
                 prev
             </button>
-            <button @click="zlider?.controller?.next">
+            <button @click="zlider3?.controller?.next">
                 next
             </button>
         </nav>

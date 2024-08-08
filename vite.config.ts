@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-
 import vue from '@vitejs/plugin-vue';
 import unimport from 'unimport/unplugin';
 

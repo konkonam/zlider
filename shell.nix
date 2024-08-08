@@ -4,6 +4,6 @@ pkgs.mkShell {
   name = "zlider";
 
     buildInputs =[
-        pkgs.nodejs_21
+        pkgs.nodejs
     ];
 }
