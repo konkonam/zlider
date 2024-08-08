@@ -1,15 +1,13 @@
-import { ComputedRef, Reactive } from 'vue';
-
-export type Controller = {
-    jump?: (by: number) => void,
-    go?: (to: number) => void,
-};
-
-export type Options = {
-    arrows: boolean;
-};
+import { VNode } from 'vue';
 
 export type Zlider = {
-    controller?: Controller;
-    options: ComputedRef<Options>;
+    index?: number;
+    jump: (by: number) => void;
+    go: (to: number) => void;
+    prev: () => void;
+    next: () => void;
+    children: VNode[];
+    options: {
+        arrows: boolean;
+    };
 };

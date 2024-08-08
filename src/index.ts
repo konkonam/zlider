@@ -1,104 +1,53 @@
-import type { App, DirectiveBinding, VNode } from "vue";
-import type { Options } from "./types";
+import type { Zlider } from "./types";
+import type { App, VNode } from "vue";
+import { isVNode } from 'vue';
+import { DirectiveBinding } from '@vue/runtime-core';
 
-import { defu } from "defu";
-import { DirectiveHook } from "@vue/runtime-core";
-import { computed, h, render } from "vue";
+const processChildren = (vnode: VNode, bind: DirectiveBinding<Zlider>): VNode[] => {
+    const children = Array.of(vnode.children)
+        .filter((item) => isVNode(item)) as unknown as VNode[]
 
-type MountedFn = DirectiveHook<HTMLElement, DirectiveBinding<V>, VNode<any, HTMLElement>>;
+    // we have to convert this to a user-friendly API, but still not too custom
+    // https://vuejs.org/guide/built-ins/transition#javascript-hooks
+    for (const [index, child] of children.entries()) {
+        child.el.style.display = index === bind.value.index ? 'block' : 'none'
 
-const defaultOptions: Options = {
-    arrows: true,
-} as const;
-
-const getParentElement = (element: HTMLElement & { zlider?: Zlider }, depth: 0) => {
-    if (depth > 10) return;
-
-    if (element.zlider !== undefined) {
-        return element;
+        child.transition.beforeEnter = () => {}
+        child.transition.enter = () => {}
+        child.transition.leave = () => {}
+        child.transition.afterLeave = () => {}
+        child.transition.persisted = true
+        child.transition.afterLeave = () => {}
+        child.transition.afterLeave = () => {}
     }
 
-    return getParentElement(element.parentElement, depth++);
-};
+    return children
+}
 
-const init: MountedFn = (element, binding, vnode) => {
-    const children = computed(() => element.children);
-    const options = vnode.zlider.options;
-
-    const index = ref(0);
+const setup = (el: HTMLElement, bind: DirectiveBinding<Zlider>, vnode: VNode) => {
+    bind.value.children = processChildren(vnode, bind)
 
     const jump = (by: number) => {
-        index.value = (index.value + by + children.value.length) % children.value.length;
+        bind.value.index = bind.value.index + by
     }
 
     const go = (to: number) => {
-        index.value = to % children.value.length;
+        bind.value.index = to % bind.value.children.length;
     }
 
-    element.zlider.controller = { jump, go };
-
-    element.classList.add('zlider');
-    for (const slide of children.value) {
-        slide.classList.add('zlider__slide');
-    }
-
-    if (!element.__zlider_arrows) {
-        const arrows = h('nav', { class: 'zlider__arrows' }, [
-            h('button', 'Prev'),
-            h('button', 'Next'),
-        ]);
-
-        render(arrows, element);
-    }
-
-    if (!element.__zlider_pagination) {
-        const pagination = h('div', 'Test');
-
-        render(pagination, element);
-    }
-};
-
-const initArrows: MountedFn = (element, binding, vnode) => {
-    console.log(getParentElement(element).zlider);
-};
-
-const initPagination: MountedFn = (element, binding, vnode) => {
-    console.log(getParentElement(element).zlider);
-};
-
-const mounted: MountedFn = (element, binding, vnode) => {
-    switch (binding.arg) {
-        case undefined:
-            init(element, binding, vnode);
-            break;
-        case 'arrows':
-            initArrows(element, binding, vnode);
-            break;
-        case 'pagination':
-            initPagination(element, binding, vnode);
-            break;
-        default:
-            console.error('Invalid usage of v-zlider directive');
-            break;
-    }
-};
-
-const created: MountedFn = (element, binding, vnode) => {
-    if (binding.arg !== undefined) return;
-
-    const options = defu(binding.value, defaultOptions);
-
-    element.zlider = {
-        controller: {},
-        options,
-    };
-};
+    bind.value.jump = (by) => jump(by)
+    bind.value.go = (to) => go(to)
+    bind.value.prev = () => jump(-1)
+    bind.value.next = () => jump(1)
+}
 
 const install = (app: App) => {
-    app.directive<HTMLElement, Options>('zlider', {
-        created,
-        mounted,
-    });
+    app.directive<HTMLElement, Zlider>('zlider', {
+        created: (el, bind, vnode) => {
+            setup(el, bind, vnode)
+        },
+        updated: setup,
+    })
 };
 
-export default install;
+export default install
