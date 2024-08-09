@@ -5,16 +5,18 @@ import { isVNode } from "vue";
 import defu from 'defu';
 import { isArray } from '@vue/shared';
 
-export type Zlider = {
-    index?: number;
-    jump?: (by: number) => void;
-    go?: (to: number) => void;
-    prev?: () => void;
-    next?: () => void;
-    options?: {
-        arrows?: boolean;
+export interface ZliderElement {
+    index: number;
+    jump: (by: number) => void;
+    go: (to: number) => void;
+    prev: () => void;
+    next: () => void;
+    options: {
+        arrows: boolean;
     };
-};
+}
+
+export type Zlider = Partial<ZliderElement>;
 
 const initSlides = (children: VNodeNormalizedChildren, bind: DirectiveBinding<Zlider>) => {
     for (const [index, child] of isArray(children) ? children.entries() : []) {
