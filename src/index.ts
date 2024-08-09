@@ -1,38 +1,46 @@
+import type { App, VNode, VNodeNormalizedChildren } from "vue";
+import type { DirectiveBinding, TransitionHooks } from '@vue/runtime-core';
 import type { Zlider } from "./types";
-import type { App, VNode } from "vue";
-import { isVNode } from 'vue';
-import { DirectiveBinding } from '@vue/runtime-core';
 
-const processChildren = (vnode: VNode, bind: DirectiveBinding<Zlider>): VNode[] => {
-    const children = Array.of(vnode.children)
-        .filter((item) => isVNode(item)) as unknown as VNode[]
+import defu from 'defu';
+import { isVNode } from "vue";
 
-    // we have to convert this to a user-friendly API, but still not too custom
-    // https://vuejs.org/guide/built-ins/transition#javascript-hooks
+const initSlides = (children: VNodeNormalizedChildren, bind: DirectiveBinding<Zlider>) => {
     for (const [index, child] of children.entries()) {
+        if (!isVNode(child)) continue;
+
         child.el.style.display = index === bind.value.index ? 'block' : 'none'
 
-        child.transition.beforeEnter = () => {}
-        child.transition.enter = () => {}
-        child.transition.leave = () => {}
-        child.transition.afterLeave = () => {}
-        child.transition.persisted = true
-        child.transition.afterLeave = () => {}
-        child.transition.afterLeave = () => {}
-    }
+        const onEnter: TransitionHooks['enter'] = (el) => {
+            el.style.opacity = 1;
+        }
 
-    return children
+        const onLeave: TransitionHooks['enter'] = (el) => {
+            el.style.opacity = 0;
+        }
+
+        child.transition = defu(child.transition, {
+            enter: onEnter,
+            leave: onLeave,
+            persisted: true,
+        })
+    }
 }
 
 const setup = (el: HTMLElement, bind: DirectiveBinding<Zlider>, vnode: VNode) => {
-    bind.value.children = processChildren(vnode, bind)
+    if (bind.value === undefined) bind.value = {}
+    if (bind.value.index === undefined) bind.value.index = 0
+
+    const slides = vnode.children.length === 1 ? vnode.children[0].children : vnode.children
+
+    initSlides(slides, bind)
 
     const jump = (by: number) => {
-        bind.value.index = bind.value.index + by
+        bind.value.index = (bind.value.index + by + slides.length) % slides.length
     }
 
     const go = (to: number) => {
-        bind.value.index = to % bind.value.children.length;
+        bind.value.index = to % slides.length
     }
 
     bind.value.jump = (by) => jump(by)
@@ -43,9 +51,7 @@ const setup = (el: HTMLElement, bind: DirectiveBinding<Zlider>, vnode: VNode) =>
 
 const install = (app: App) => {
     app.directive<HTMLElement, Zlider>('zlider', {
-        created: (el, bind, vnode) => {
-            setup(el, bind, vnode)
-        },
+        created: setup,
         updated: setup,
     })
 };

@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import type { Zlider } from 'zlider/types';
+
 import { reactive } from 'vue';
 
-const zlider = reactive<Zlider>({
-    index: 0,
-    options: {
-        arrows: false
-    },
-});
+const zlider = reactive<Zlider>({});
 
 const users = [
     { name: 'John', surname: 'Doe' },
