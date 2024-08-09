@@ -1,9 +1,15 @@
-import type { DirectiveBinding, RendererElement } from '@vue/runtime-core';
 import type { App, VNode, VNodeNormalizedChildren } from "vue";
+import type { DirectiveBinding } from '@vue/runtime-core';
 
-import { isVNode } from "vue";
-import defu from 'defu';
+import {
+    isVNode, resolveTransitionHooks,
+    setTransitionHooks,
+    useTransitionState,
+    vShow,
+    withDirectives
+} from "vue";
 import { isArray } from '@vue/shared';
+import { TransitionProps } from '@vue/runtime-dom';
 
 export interface ZliderElement {
     index: number;
@@ -13,30 +19,32 @@ export interface ZliderElement {
     next: () => void;
     options: {
         arrows: boolean;
+        transition: TransitionProps;
     };
 }
 
 export type Zlider = Partial<ZliderElement>;
 
+const initTransition = (vnode: VNode, bind: DirectiveBinding<Zlider>) => {
+    const instance = getCurrentInstance()!
+    const state = useTransitionState()
+
+    setTransitionHooks(
+        vnode,
+        resolveTransitionHooks(
+            vnode,
+            bind.value.options.transition,
+            state,
+            instance,
+        ),
+    )
+}
+
 const initSlides = (children: VNodeNormalizedChildren, bind: DirectiveBinding<Zlider>) => {
     for (const [index, child] of isArray(children) ? children.entries() : []) {
         if (!isVNode(child)) continue;
 
-        child.el.style.display = index === bind.value.index ? 'block' : 'none'
-
-        const onEnter = (el: RendererElement) => {
-            el.style.opacity = 1;
-        }
-
-        const onLeave = (el: RendererElement) => {
-            el.style.opacity = 0;
-        }
-
-        child.transition = defu(child.transition, {
-            enter: onEnter,
-            leave: onLeave,
-            persisted: true,
-        })
+        initTransition(child, bind)
     }
 }
 
@@ -50,10 +58,12 @@ const setup = (el: HTMLElement, bind: DirectiveBinding<Zlider>, vnode: VNode) =>
 
     const jump = (by: number) => {
         bind.value.index = (bind.value.index + by + slides.length) % slides.length
+        bind.instance.$emit('zlide', slides[bind.value.index])
     }
 
     const go = (to: number) => {
         bind.value.index = to % slides.length
+        bind.instance.$emit('zlide', slides[bind.value.index])
     }
 
     bind.value.jump = (by) => jump(by)

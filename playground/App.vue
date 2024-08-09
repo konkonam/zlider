@@ -1,15 +1,27 @@
 <script setup lang="ts">
 import type { Zlider } from 'zlider';
 
-const zlider = reactive<Zlider>({});
+const zlider = reactive<Zlider>({
+    options: {
+        arrows: true,
+        transition: {
+            enterFromClass: 'slide-enter-from',
+            enterActiveClass: 'slide-enter-active',
+            enterToClass: 'slide-enter-to',
+            leaveFromClass: 'slide-leave-from',
+            leaveActiveClass: 'slide-leave-active',
+            leaveToClass: 'slide-leave-to',
+        }
+    }
+});
+
+const index = computed(() => zlider.index)
 
 const users = [
     { name: 'John', surname: 'Doe' },
     { name: 'David', surname: 'lol' },
     { name: 'a', surname: 'bc' },
 ];
-
-const index = computed(() => zlider.index)
 </script>
 
 <template>
@@ -18,9 +30,9 @@ const index = computed(() => zlider.index)
 
         {{ index }}
 
-        <ul v-zlider="zlider">
+        <ul v-zlider="zlider" v-on:zswipe="(data) => console.log(data)">
             <li v-for="(user, index) in users" :key="index">
-                <span>{{ user }}</span>
+                <span>{{ user.name }} {{ user.surname }}</span>
             </li>
         </ul>
 
