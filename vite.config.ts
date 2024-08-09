@@ -1,20 +1,21 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
-import unimport from 'unimport/unplugin';
+import AutoImport from 'unplugin-auto-import/vite'
 
 export default defineConfig({
   root: 'playground',
 
   plugins: [
     vue(),
-    unimport.vite({
-      presets: [
-        'vue',
-      ],
+    AutoImport({
+      include: /\.(vue|js|ts|)($|\?)/,
       imports: [
-        { name: 'defu', from: 'defu' }
-      ]
+          'vue',
+      ],
+
+      dts: '../node_modules/.vite/auto-imports.d.ts',
+      vueTemplate: true,
     }),
   ],
 

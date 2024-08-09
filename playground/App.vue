@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { Zlider } from 'zlider/types';
-
-import { reactive } from 'vue';
+import type { Zlider } from 'zlider';
 
 const zlider = reactive<Zlider>({});
 

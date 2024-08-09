@@ -25,6 +25,7 @@
         "@types/node": "^22.1",
         "@vitejs/plugin-vue": "^5.1",
         "unimport": "^3.9",
+        "unplugin-auto-import": "^0.18.2",
         "vite": "^5.3"
     }
 }

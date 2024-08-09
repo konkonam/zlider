@@ -2,14 +2,19 @@
     "compilerOptions": {
         "target": "ESNext",
         "module": "ESNext",
-        "moduleResolution": "Node",
+        "moduleResolution": "Bundler",
+        "paths": {
+            "zlider": ["./src/index.ts"]
+        }
     },
     "include": [
         "**/*.ts",
         "**/*.vue"
     ],
     "files": [
-        "./src"
+        "./playground/**/*",
+        "./src/**/*",
+        "node_modules/.vite/auto-imports.d.ts"
     ],
     "exclude": [
         "node_modules"

@@ -1,21 +1,32 @@
+import type { DirectiveBinding, RendererElement } from '@vue/runtime-core';
 import type { App, VNode, VNodeNormalizedChildren } from "vue";
-import type { DirectiveBinding, TransitionHooks } from '@vue/runtime-core';
-import type { Zlider } from "./types";
 
-import defu from 'defu';
 import { isVNode } from "vue";
+import defu from 'defu';
+import { isArray } from '@vue/shared';
+
+export type Zlider = {
+    index?: number;
+    jump?: (by: number) => void;
+    go?: (to: number) => void;
+    prev?: () => void;
+    next?: () => void;
+    options?: {
+        arrows?: boolean;
+    };
+};
 
 const initSlides = (children: VNodeNormalizedChildren, bind: DirectiveBinding<Zlider>) => {
-    for (const [index, child] of children.entries()) {
+    for (const [index, child] of isArray(children) ? children.entries() : []) {
         if (!isVNode(child)) continue;
 
         child.el.style.display = index === bind.value.index ? 'block' : 'none'
 
-        const onEnter: TransitionHooks['enter'] = (el) => {
+        const onEnter = (el: RendererElement) => {
             el.style.opacity = 1;
         }
 
-        const onLeave: TransitionHooks['enter'] = (el) => {
+        const onLeave = (el: RendererElement) => {
             el.style.opacity = 0;
         }
 
