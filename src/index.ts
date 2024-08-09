@@ -1,12 +1,14 @@
 import type { DirectiveBinding } from '@vue/runtime-core'
-import type { App, VNode, VNodeNormalizedChildren } from 'vue'
+import type { App, TransitionProps, VNode, VNodeNormalizedChildren } from 'vue'
 
 import { isArray } from '@vue/shared'
 import defu from 'defu';
+import { isVNode, resolveTransitionHooks, setTransitionHooks, useTransitionState } from 'vue';
 
 export interface ZliderOptions {
     index: number
     arrows: boolean
+    transition?: TransitionProps
 }
 
 export interface ZliderElement {
@@ -24,9 +26,21 @@ const defaultOptions: ZliderOptions = {
     arrows: true,
 } as const
 
-const initSlides = (children: VNodeNormalizedChildren, vnode: VNode) => {
-    for (const [index, child] of isArray(children) ? children.entries() : []) {
-        child.el.style.display = index === vnode.zlider.index ? 'block' : 'none'
+const initSlides = (children: VNodeNormalizedChildren, bind: DirectiveBinding<Zlider>) => {
+    for (const child of isArray(children) ? children.entries() : []) {
+        if (!isVNode(child)) continue
+
+        if (bind.value.options.transition) {
+            setTransitionHooks(
+                child,
+                resolveTransitionHooks(
+                    child,
+                    bind.value.options.transition,
+                    useTransitionState(),
+                    getCurrentInstance(),
+                ),
+            )
+        }
     }
 }
 
@@ -40,11 +54,13 @@ const setup = (el: HTMLElement, bind: DirectiveBinding<Zlider>, vnode: VNode) =>
     const jump = (by: number) => {
         vnode.zlider.index = (vnode.zlider.index + by + slides.length) % slides.length
         updated(el, bind, vnode)
+        bind.instance.$emit('zswipe', bind.value.options.index)
     }
 
     const go = (to: number) => {
         vnode.zlider.index = to % slides.length
         updated(el, bind, vnode)
+        bind.instance.$emit('zswipe', bind.value.options.index)
     }
 
     if (bind.value !== undefined) {
