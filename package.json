@@ -17,6 +17,7 @@
         "build": "vite build",
         "dev": "vite dev"
     },
+    "web-types": "./web-types.json",
     "dependencies": {
         "defu": "^6.1",
         "vue": "^3.4"
