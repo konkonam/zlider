@@ -9,8 +9,6 @@ const users = [
     { name: 'David', surname: 'lol' },
     { name: 'a', surname: 'bc' },
 ]
-
-watch(zlider, (value) => console.log(value))
 </script>
 
 <template>
