@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import type { Zlider } from 'zlider';
+import type { Zlider } from 'zlider'
 
-const zlider = reactive<Zlider>({});
+const zlider = reactive<Zlider>({
+})
 
 const users = [
     { name: 'John', surname: 'Doe' },
     { name: 'David', surname: 'lol' },
     { name: 'a', surname: 'bc' },
-];
+]
 
-const index = computed(() => zlider.index)
+watch(zlider, (value) => console.log(value))
 </script>
 
 <template>
     <div>
         <h1>Zlider playground</h1>
-
-        {{ index }}
 
         <ul v-zlider="zlider">
             <li v-for="(user, index) in users" :key="index">
@@ -38,15 +37,14 @@ ul {
     margin: 0 auto;
 }
 
-.slide-enter-active, .slide-leave-active {
-    transition: transform 0.5s ease;
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.5s ease;
 }
 
-.slide-enter-from, .slide-leave-to {
-    transform: translateX(100%);
-}
-
-.slide-leave-from, .slide-enter-to {
-    transform: translateX(0);
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
 }
 </style>
